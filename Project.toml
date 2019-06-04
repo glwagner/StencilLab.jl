@@ -1,0 +1,4 @@
+name = "StencilLab"
+uuid = "30f4a942-86c8-11e9-082b-791d89442ed7"
+authors = ["Gregory Wagner <wagner.greg@gmail.com>"]
+version = "0.1.0"

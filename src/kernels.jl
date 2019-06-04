@@ -1,12 +1,21 @@
-function ∇²_kernel_naive!(q, ψ, N)
-    @loop for k in (1:N.z; (blockIdx().z - 1) * blockDim().z + threadIdx().z)
-        @loop for j in (1:N.y; (blockIdx().y - 1) * blockDim().y + threadIdx().y)
-            @loop for i in (1:N.x; (blockIdx().x - 1) * blockDim().x + threadIdx().x)
+const c = 1
+const f = -1
 
-                @inbounds q[i, j, k] = ∇²_ccc(i, j, k, ψ)
+function ∇²_kernel_naive!(q, ψ, L)
 
-            end
-        end
+    cuindex() = CartesianIndex(
+        (blockIdx().x - 1) * blockDim().x + threadIdx().x,
+        (blockIdx().y - 1) * blockDim().y + threadIdx().y,
+        (blockIdx().z - 1) * blockDim().z + threadIdx().z
+    )
+
+    @loop for I in (CartesianIndices(ψ); cuindex())
+        @inbounds q[I] = ∇²(I, L, ψ)
     end
     return nothing
 end
+
+∇²_kernel_naive_ccc!(q, ψ) = ∇²_kernel_naive!(q, ψ, (c, c, c))
+∇²_kernel_naive_fcc!(q, ψ) = ∇²_kernel_naive!(q, ψ, (f, c, c))
+∇²_kernel_naive_cfc!(q, ψ) = ∇²_kernel_naive!(q, ψ, (c, f, c))
+∇²_kernel_naive_ccf!(q, ψ) = ∇²_kernel_naive!(q, ψ, (c, c, f))

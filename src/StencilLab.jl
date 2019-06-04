@@ -1,5 +1,6 @@
-module KernelLab
+module StencilLab
 
-greet() = print("Hello World!")
+include("operators.jl")
+include("kernels.jl")
 
 end # module

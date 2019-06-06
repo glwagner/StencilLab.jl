@@ -1,14 +1,20 @@
-@inline OneToMinusTwo(n) = Base.OneTo(n-2)
+@inline OneToMinusTwoPlus(n) = Base.OneTo(-2+n)
 
 function interioraxes(a)
     Base.@_inline_meta
-    map(OneToMinusTwo, size(a))
+    return map(OneToMinusTwoPlus, size(a))
 end
 
 InteriorCartesianIndices(a) = CartesianIndices(interioraxes(a))
 
 const c = 1
 const f = -1
+
+# Some 3D niceties
+const ccc = (c, c, c)
+const fcc = (f, c, c)
+const cfc = (c, f, c)
+const ccf = (c, c, f)
 
 function ∇²_kernel_naive!(q, ψ, L)
 
@@ -21,14 +27,14 @@ function ∇²_kernel_naive!(q, ψ, L)
     @loop for I in (InteriorCartesianIndices(ψ); cuindex())
         @inbounds q[I] = ∇²(I, L, ψ)
     end
+
     return nothing
 end
 
-∇²_kernel_naive_ccc!(q, ψ) = ∇²_kernel_naive!(q, ψ, (c, c, c))
-∇²_kernel_naive_fcc!(q, ψ) = ∇²_kernel_naive!(q, ψ, (f, c, c))
-∇²_kernel_naive_cfc!(q, ψ) = ∇²_kernel_naive!(q, ψ, (c, f, c))
-∇²_kernel_naive_ccf!(q, ψ) = ∇²_kernel_naive!(q, ψ, (c, c, f))
-
+∇²_kernel_naive_ccc!(q, ψ) = ∇²_kernel_naive!(q, ψ, ccc)
+∇²_kernel_naive_fcc!(q, ψ) = ∇²_kernel_naive!(q, ψ, fcc)
+∇²_kernel_naive_cfc!(q, ψ) = ∇²_kernel_naive!(q, ψ, cfc)
+∇²_kernel_naive_ccf!(q, ψ) = ∇²_kernel_naive!(q, ψ, ccf)
 
 function diffusion_kernel_naive!(ϕ, Δt)
 
@@ -39,7 +45,8 @@ function diffusion_kernel_naive!(ϕ, Δt)
     )
 
     @loop for I in (InteriorCartesianIndices(ϕ); cuindex())
-        @inbounds ϕ[I] += Δt * ∇²(I, (c, c, c), ϕ)
+        @inbounds ϕ[I] += Δt * ∇²(I, ccc, ϕ)
     end
+
     return nothing
 end

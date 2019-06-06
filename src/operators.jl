@@ -22,9 +22,9 @@ Interpolate `u` from `from` to `to` at `I`.
 
 
 """
-    a_b(I, Lab, a, La, b, Lb)
+    a_b(I, Lc, a, La, b, Lb)
 
-Interpolate `a` and `b` from `La` and `Lb` to `Lab`
+Interpolate `a` and `b` from `La` and `Lb` to `Lc`
 and multiply them there.
 """
-a_b(I, Lab, La, a, Lb, b) = ▶(I, Lab, La, a) * ▶(I, Lab, Lb, b)
+a_b(I, Lc, La, a, Lb, b) = ▶(I, Lc, La, a) * ▶(I, Lc, Lb, b)
